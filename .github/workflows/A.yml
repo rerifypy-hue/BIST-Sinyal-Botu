@@ -1,1 +1,31 @@
+name: Daily BIST Bot
 
+on:
+  schedule:
+    # Run at 18:05 TRT (UTC+3) -> 15:05 UTC
+    - cron: '5 15 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r bot/requirements.txt
+        
+    - name: Run Bot
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+      run: python main.py
